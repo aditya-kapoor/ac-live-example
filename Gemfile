@@ -6,7 +6,9 @@ gem 'uglifier'
 gem 'coffee-rails'
 gem 'therubyracer', platforms: :ruby
 gem 'jquery-rails'
-gem 'puma'
+gem 'unicorn'
+gem 'capistrano'
+
 group :development, :test do
   gem 'byebug'
   gem 'web-console'
