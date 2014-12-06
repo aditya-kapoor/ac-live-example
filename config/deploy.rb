@@ -7,7 +7,7 @@ set :repo_url, 'git@github.com:aditya-kapoor/ac-live-example.git'
 set :deploy_to, '/var/www/apps/ACLive'
 set :scm, :git
 set :format, :pretty
-
+set :sudo, false
 set :linked_files, %w{config/database.yml config/secrets.yml}
 
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/assets}
@@ -23,7 +23,6 @@ namespace :deploy do
         with rails_env: fetch(:rails_env) do
           Rake::Task[:'database:migrate'].invoke
           Rake::Task[:'unicorn:hard_restart'].invoke
-          Rake::Task[:'delayed_job:restart'].invoke
         end
       end
     end
@@ -66,3 +65,37 @@ namespace :unicorn do
   end
 end
 
+namespace :database do
+  desc 'create database'
+  task :create do
+    on roles(:db), in: :parallel do
+      within current_path do
+        with rails_env: fetch(:rails_env) do
+          execute :bundle, :exec, :rake, 'db:create'
+        end
+      end
+    end
+  end
+
+  desc 'migrate'
+  task :migrate do
+    on roles(:db), in: :parallel do
+      within current_path do
+        with rails_env: fetch(:rails_env) do
+          execute :bundle, :exec, :rake, 'db:migrate'
+        end
+      end
+    end
+  end
+
+  desc 'seed'
+  task :seed do
+    on roles(:db), in: :parallel do
+      within current_path do
+        with rails_env: fetch(:rails_env) do
+          execute :bundle, :exec, :rake, 'db:seed'
+        end
+      end
+    end
+  end 
+end
